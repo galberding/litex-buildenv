@@ -57,6 +57,11 @@ def get_soc(args, platform):
     soc = SoC(platform, ident=SoC.__name__, **soc_sdram_argdict(args), **dict(args.target_option))
     if hasattr(soc, 'configure_iprange'):
         soc.configure_iprange(args.iprange)
+    if hasattr(soc, "add_sdcard"):
+        soc.add_sdcard()
+    else:
+        print("Buuuh")
+        exit()
     return soc
 
 
