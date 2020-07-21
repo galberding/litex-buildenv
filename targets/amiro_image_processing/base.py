@@ -21,7 +21,7 @@ from .crg import _CRG
 
 from litex.soc.cores import uart
 
-# from litex.soc.cores.timer import Timer
+from litex.soc.cores.timer import Timer
 # from litesdcard.phy import SDPHY, SDPHYClocker
 # # from litesdcard.clocker import SDClockerS7
 # from litesdcard.core import SDCore
