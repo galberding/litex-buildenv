@@ -51,3 +51,6 @@
 # 	path = third_party/litesdcard_fix
 # 	url = https://github.com/antmicro/litesdcard.git
 # 	branch = sdcard-fixes
+[submodule "third_party/litesdcard"]
+	path = third_party/litesdcard
+	url = https://github.com/antmicro/litesdcard.git
