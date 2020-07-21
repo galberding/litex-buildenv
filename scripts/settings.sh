@@ -36,4 +36,5 @@ LITE_REPOS="
 	litescope
 	litevideo
 	liteiclink
+  litesdcard
 	"

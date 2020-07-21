@@ -247,7 +247,7 @@ image-flash-py: image
 # This is indicated by a "git submodule status" that does not start with
 # a space (" ").
 #
-LITEX_SUBMODULES=migen litex litedram liteeth litepcie litesata litescope litevideo
+LITEX_SUBMODULES=migen litex litedram liteeth litepcie litesata litescope litevideo litesdcard
 litex-submodules: $(addsuffix /.git,$(addprefix third_party/,$(LITEX_SUBMODULES)))
 	@if git submodule status --recursive | grep "^[^ ]" >/dev/null; then \
 		echo ""; \
@@ -317,7 +317,7 @@ $(FIRMWARE_FILEBASE).bin: firmware-cmd
 
 
 ifeq ($(CPU_ENDIANNESS), little)
-    MKMSCIMG = $(PYTHON) -m litex.soc.software.mkmscimg --little 
+    MKMSCIMG = $(PYTHON) -m litex.soc.software.mkmscimg --little
 else
     MKMSCIMG = $(PYTHON) -m litex.soc.software.mkmscimg
 endif

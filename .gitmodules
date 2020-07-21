@@ -44,3 +44,6 @@
 [submodule "third_party/liteiclink"]
 	path = third_party/liteiclink
 	url = https://github.com/enjoy-digital/liteiclink.git
+[submodule "third_party/litesdcard"]
+	path = third_party/litesdcard
+	url = https://github.com/enjoy-digital/litesdcard
