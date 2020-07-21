@@ -21,6 +21,13 @@ from .crg import _CRG
 
 from litex.soc.cores import uart
 
+
+from litesdcard.phy import SDPHY
+from litesdcard.clocker import SDClockerS7
+from litesdcard.core import SDCore
+from litesdcard.bist import BISTBlockGenerator, BISTBlockChecker
+
+
 class BaseSoC(SoCSDRAM):
     mem_map = {**SoCSDRAM.mem_map, **{
         'spiflash': 0x20000000,
@@ -34,14 +41,14 @@ class BaseSoC(SoCSDRAM):
         sys_clk_freq = 50*1000000
         # SoCSDRAM ---------------------------------------------------------------------------------
         SoCSDRAM.__init__(self, platform, clk_freq=sys_clk_freq, **kwargs)
-        self.submodules.uartbone  = uart.UARTWishboneBridge(
-                pads     = self.platform.request("serial"),
-                clk_freq = self.sys_clk_freq,
-                baudrate = 115200)
-        self.bus.add_master(name="uartbone", master=self.uartbone.wishbone)
+        # self.submodules.uartbone  = uart.UARTWishboneBridge(
+        #         pads     = self.platform.request("serial"),
+        #         clk_freq = self.sys_clk_freq,
+        #         baudrate = 115200)
+        # self.bus.add_master(name="uartbone", master=self.uartbone.wishbone)
         # CRG --------------------------------------------------------------------------------------
         self.submodules.crg = _CRG(platform, sys_clk_freq)
-        
+
         self.platform.add_period_constraint(self.crg.cd_sys.clk, 1e9/sys_clk_freq)
 
         #self.submodules.uartbone  = uart.UARTWishboneBridge(
@@ -89,7 +96,7 @@ class BaseSoC(SoCSDRAM):
         #    address=0xf00f0000,
         #    interface=self.cpu.debug_bus, #debug_bus,
         #    size=0x100)
-    
+
         #analyzer_signals = [
         #    #self.ddrphy.sys_clk,
         #    #platform.lookup_request("ddram").a,
@@ -101,7 +108,7 @@ class BaseSoC(SoCSDRAM):
         #     platform.lookup_request("ddram").cke,
             #self.cpu.ibus.stb,
         #    self.cpu.ibus.cyc
-        #]    
+        #]
         #self.submodules.analyzer = LiteScopeAnalyzer(analyzer_signals,
         #    depth        = 4096, # 512
         #    clock_domain = "sys",
@@ -130,5 +137,34 @@ class BaseSoC(SoCSDRAM):
         #self.flash_boot_address = self.mem_map["spiflash"]+platform.gateware_size+bios_size
         #define_flash_constants(self)
 
+
+
+    def add_sdcard(self):
+        sdcard_pads = self.platform.request("sdcard")
+        if hasattr(sdcard_pads, "rst"):
+            self.comb += sdcard_pads.rst.eq(0)
+        self.submodules.sdclk = SDClockerS7(sys_clk_freq=self.sys_clk_freq)
+        self.submodules.sdphy = SDPHY(sdcard_pads, self.platform.device)
+        self.submodules.sdcore = SDCore(self.sdphy)
+        self.submodules.sdtimer = Timer()
+        self.add_csr("sdclk")
+        self.add_csr("sdphy")
+        self.add_csr("sdcore")
+        self.add_csr("sdtimer")
+
+        self.submodules.bist_generator = BISTBlockGenerator(random=True)
+        self.submodules.bist_checker = BISTBlockChecker(random=True)
+        self.add_csr("bist_generator")
+        self.add_csr("bist_checker")
+        self.comb += [
+            self.sdcore.source.connect(self.bist_checker.sink),
+            self.bist_generator.source.connect(self.sdcore.sink)
+        ]
+        self.platform.add_period_constraint(self.sdclk.cd_sd.clk, period_ns(self.sys_clk_freq))
+        self.platform.add_period_constraint(self.sdclk.cd_sd_fb.clk, period_ns(self.sys_clk_freq))
+        self.platform.add_false_path_constraints(
+            self.crg.cd_sys.clk,
+            self.sdclk.cd_sd.clk,
+            self.sdclk.cd_sd_fb.clk)
 
 SoC = BaseSoC

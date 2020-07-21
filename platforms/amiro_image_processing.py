@@ -233,7 +233,7 @@ _io = [
         Subsignal("n", Pins("J19")),
         IOStandard("DIFF_MOBILE_DDR"), Misc("SLEW=FAST"), Misc("DRIVE=24") #DIFF_MOBILE_DDR DIFF_MOBILE_DDR DIFF_SSTL18_II
     ),
-    
+
     ("ddram", 0, #lpddr_dqs?
         Subsignal("a", Pins("F21 F22 E22 G20 F20 K20 K19 E20 C20 C22 G19 F19 D22 D19")),
         Subsignal("ba", Pins("J17 K17")),
@@ -325,22 +325,22 @@ _io = [
     # NET "HDMIIN2D2N"  LOC = "J18"; # Bank = 1, Pin name = IO_L44N_A2_M1DQ7,    Sch name = TMDS-RX-2_N
     # NET "HDMIIN2SCL"  LOC = "M16"; # Bank = 1, Pin name = IO_L47P_FWE_B_M1DQ0, Sch name = TMDS-RX-SCL
     # NET "HDMIIN2SDA"  LOC = "M18"; # Bank = 1, Pin name = IO_L47N_LDC_M1DQ1,   Sch name = TMDS-RX-SDA
-    ("hdmi_in", 1,
-        Subsignal("clk_p", Pins("H17")),
-        Subsignal("clk_n", Pins("H18")),
-        Subsignal("data0_p", Pins("K17")),
-        Subsignal("data0_n", Pins("K18")),
-        Subsignal("data1_p", Pins("L17")),
-        Subsignal("data1_n", Pins("L18")),
-        Subsignal("data2_p", Pins("J16")),
-        Subsignal("data2_n", Pins("J18")),
-        # Disconnect JP6 and JP7 for FPGA SCL/SDA control, otherwise
-        # this is connected to J2's SCL/SDA pins.
-        Subsignal("scl", Pins("M16"), IOStandard(LVCMOS_BANK1)),
-        Subsignal("sda", Pins("M18"), IOStandard(LVCMOS_BANK1)),
-        #Subsignal("hpd_notif", Pins("G16"), IOStandard("LVCMOS33")),
-        #Subsignal("hpd_en", Pins("B20"), IOStandard("LVCMOS33"))
-    ),
+    # ("hdmi_in", 1,
+    #     Subsignal("clk_p", Pins("H17")),
+    #     Subsignal("clk_n", Pins("H18")),
+    #     Subsignal("data0_p", Pins("K17")),
+    #     Subsignal("data0_n", Pins("K18")),
+    #     Subsignal("data1_p", Pins("L17")),
+    #     Subsignal("data1_n", Pins("L18")),
+    #     Subsignal("data2_p", Pins("J16")),
+    #     Subsignal("data2_n", Pins("J18")),
+    #     # Disconnect JP6 and JP7 for FPGA SCL/SDA control, otherwise
+    #     # this is connected to J2's SCL/SDA pins.
+    #     Subsignal("scl", Pins("M16"), IOStandard(LVCMOS_BANK1)),
+    #     Subsignal("sda", Pins("M18"), IOStandard(LVCMOS_BANK1)),
+    #     #Subsignal("hpd_notif", Pins("G16"), IOStandard("LVCMOS33")),
+    #     #Subsignal("hpd_en", Pins("B20"), IOStandard("LVCMOS33"))
+    # ),
 
     ## onboard USB Host Controller - FIXME
     # PIC32MX440F256H-40I/MR
@@ -376,6 +376,16 @@ _io = [
         Subsignal("rx", Pins("AB8"), IOStandard("LVCMOS33")),
         Subsignal("tx", Pins("AB9"), IOStandard("LVCMOS33")),
     ),
+        ("sdcard", 0,
+        # Subsignal("rst",  Pins("E2"),          Misc("PULLUP True")),
+         # SD_DAT 0-3
+        Subsignal("data", Pins("AA4 Y3 AB4 AB3"), Misc("PULLUP True")),
+        Subsignal("cmd",  Pins("AB2"),          Misc("PULLUP True")),
+        Subsignal("clk",  Pins("AA2")),
+        Misc("SLEW=FAST"),
+        IOStandard("LVCMOS33"),
+    ),
+
 
 #        ("fpga_cfg",
 #            Subsignal("din", Pins("T14")),
@@ -649,5 +659,3 @@ class Platform(XilinxPlatform):
             self.add_period_constraint(self.lookup_request("fx2").ifclk, 10)
         except ConstraintError:
             pass
-
-
