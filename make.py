@@ -59,6 +59,8 @@ def get_soc(args, platform):
         soc.configure_iprange(args.iprange)
     if hasattr(soc, "add_sdcard"):
         soc.add_sdcard()
+        print("New clock:", soc.sys_clk_freq)
+        # exit()
     else:
         print("Buuuh")
         exit()
